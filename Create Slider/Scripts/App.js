@@ -10,11 +10,13 @@ function initializePage()
     // This code runs when the DOM is ready and creates a context object which is needed to use the SharePoint object model
     $(document).ready(function () {
         $('#siteContent').attr('href', decodeURIComponent(getQueryStringParameter('SPHostUrl')) + "/_layouts/15/viewlsts.aspx");
-        $('#createList').click(createList);
+        $('#createList').click(createSliderList);
     });
 
     //#1 Create List
-    function createList() {
+    function createSliderList() {
+        var imgTarget = decodeURIComponent(getQueryStringParameter('SPHostUrl')) + '/SiteAssets/l_Sliderx96.png'
+
         // Create an announcement SharePoint list with the name that the user specifies.
         var hostUrl = decodeURIComponent(getQueryStringParameter("SPHostUrl"));
         var currentcontext = new SP.ClientContext.get_current();
@@ -26,6 +28,8 @@ function initializePage()
         listCreationInfo.set_title('Sliderr');
         listCreationInfo.set_templateType(SP.ListTemplateType.genericList);
         var newList = hostweb.get_lists().add(listCreationInfo);
+        newList.set_imageUrl(imgTarget);
+        newList.update();
 
         //Set column data
         var newCols = [
@@ -43,20 +47,21 @@ function initializePage()
         //final load/execute
         context.load(newListWithColumns);
         context.executeQueryAsync(function () {
-            console.log('List created successfully!');
+            console.log('Slider list created successfully!');
             uploadTileImage()
         },
         function (sender, args) {
             console.error(sender);
             console.error(args);
-            alert('Failed to create the list. ' + args.get_message());
+            alert('Failed to create the Slider list. ' + args.get_message());
         });
     }
 
     //#2 Upload Tile Image
     function uploadTileImage() {
         BinaryUpload.Uploader().Upload("/images/l_Sliderx96.png", "/SiteAssets/l_Sliderx96.png");
-        setImageUrl();
+        //setImageUrl();
+        createConfigList();
     }
 
     //#3 Set Tile Image
@@ -84,6 +89,37 @@ function initializePage()
                 console.error(err);
                 alert('Failed to set List.ImageUrl. Please notifiy your SharePoint Admin.');
             }
+        });
+    }
+
+    //#4 create spConfig List
+    function createConfigList() {
+        var hostUrl = decodeURIComponent(getQueryStringParameter("SPHostUrl"));
+        var currentcontext = new SP.ClientContext.get_current();
+        var hostcontext = new SP.AppContextSite(currentcontext, hostUrl);
+        var hostweb = hostcontext.get_web();
+
+        //Set ListCreationInfomation()
+        var listCreationInfo = new SP.ListCreationInformation();
+        listCreationInfo.set_title('spConfig');
+        listCreationInfo.set_templateType(SP.ListTemplateType.genericList);
+        var newList = hostweb.get_lists().add(listCreationInfo);
+        newList.set_hidden(true);
+        newList.set_onQuickLaunch(false);
+        newList.update();
+
+        //Set column data
+        var newListWithColumns = newList.get_fields().addFieldAsXml("<Field Type='Note' DisplayName='Value' Required='FALSE' EnforceUniqueValues='FALSE' NumLines='6' RichText='TRUE' RichTextMode='FullHtml' StaticName='Value' Name='Value'/>", true, SP.AddFieldOptions.defaultValue);
+
+        //final load/execute
+        context.load(newListWithColumns);
+        context.executeQueryAsync(function () {
+            console.log('spConfig list created successfully!');
+        },
+        function (sender, args) {
+            console.error(sender);
+            console.error(args);
+            alert('Failed to create the spConfig list. ' + args.get_message());
         });
     }
 

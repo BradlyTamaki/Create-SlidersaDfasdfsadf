@@ -2,8 +2,8 @@
 <!--Created:cb85b80c-f585-40ff-8bfc-12ff4d0e34a9-->
 <App xmlns="http://schemas.microsoft.com/sharepoint/2012/app/manifest"
      Name="CreateSlider"
-     ProductID="{6eb8e437-8111-4a8b-9e14-8c0284db3b45}"
-     Version="1.0.0.1"
+     ProductID="{6eb8e437-8112-4a8b-9e14-8c0284db3b45}"
+     Version="1.0.0.2"
      SharePointMinVersion="16.0.0.0"
 >
   <Properties>
